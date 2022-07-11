@@ -17,6 +17,7 @@ app.use(bodyParser.urlencoded({
 
 
 // Connecting Mongoose
+mongoose.Promise = global.Promise;
 mongoose.connect(db);
 
 app.get('/', (req, res) => {
@@ -24,12 +25,14 @@ app.get('/', (req, res) => {
 })
 
 app.get('/books', (req, res) => {
-  Book.find({}).exec((err, results) => {
-    if (err) {
-      res.send('Error has occured')
-    } else {
-      res.json(results)
-    }
+  Book.find({})
+  .exec()
+  .then((books)=>{
+    console.log(books);
+    res.json(books);
+  })
+  .catch((err)=>{
+    console.log(err);
   })
 })
 
@@ -48,6 +51,18 @@ app.post('/book',(req,res)=>{
     }
   })
 })
+
+app.post('/book2',(req,res)=>{
+  Book.create(req.body,(err,book)=>{
+    if(err){
+      return
+    }
+    else{
+      res.json({"Success": "Works"})
+    }
+  })
+})
+
 
 app.put('/book/:id',(req,res)=>{
   Book.findOneAndUpdate({
